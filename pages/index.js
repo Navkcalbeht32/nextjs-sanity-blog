@@ -1,59 +1,51 @@
+import React from 'react'
 import { useState } from 'react'
-import { Row, Col } from 'react-bootstrap'
+import Head from 'next/head'
+import { Row, Button } from 'react-bootstrap'
 import PageLayout from 'components/PageLayout'
-import CardItem from 'components/CardItem'
-import CardListItem from 'components/CardListItem'
-import FilteringMenu from 'components/FilteringMenu'
 
-import { getAllBlogs } from 'lib/api';
+
+import { getAllBlogs } from 'lib/api'
+import { useGetBlogPages } from 'actions/pagination'
 
 export default function Home({blogs}) {
 
   const [filter, setFilter] = useState({
     view: { list: 1 }
-  })
+  });
+
+  const { 
+    pages,
+    isLoadingMore,
+    isReachingEnd,
+    loadMore
+   } = useGetBlogPages({blogs});
 
   return (
-    <PageLayout>
-      <FilteringMenu 
-        filter={filter}
-        onChange={(option, value) => {
-          setFilter({...filter, [option]: value})
-        }}
-      />
-      <hr/>
-      <Row className="mb-5">
-        {/* <Col md="10">
-          <CardListItem />
-        </Col> */}
-        { blogs.map(blog =>
-          filter.view.list === 0 ? 
-          <Col key={`${blog.slug}-list`} md="9">
-            <CardListItem />
-          </Col>
-          :
-          <Col key={blog.slug} md="4">
-            <CardItem
-              author={blog.author}
-              title={blog.title}
-              subtitle={blog.subtitle}
-              date={blog.date}
-              image={blog.coverImage}
-              link={{
-                href: '/blogs/[slug]',
-                as: `/blogs/${blog.slug}`
-              }}
-            />
-          </Col>    
-          )
-        }
-      </Row>
-    </PageLayout>
+    <>
+      <PageLayout>
+        <Row className="blog-page-wrapper">
+          {pages}
+        </Row>
+        <div style={{textAlign: 'center'}}>
+          <Button
+          onClick={loadMore}
+          disabled={isReachingEnd || isLoadingMore}
+          size="lg"
+          variant="outline-secondary">
+            {isLoadingMore ? '...' : isReachingEnd ? 'No more content' : 'Load More'}
+          </Button>
+        </div>
+        
+      </PageLayout>
+      <footer className="page-footer" />
+    </>
+    
   )
 }
 
 export async function getStaticProps() {
-  const blogs = await getAllBlogs();
+  const blogs = await getAllBlogs({offset: 0});
   return {
     props: {
       blogs

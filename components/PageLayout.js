@@ -1,20 +1,23 @@
-import BlogNavbar from 'components/Navbar';
+import Header from 'components/Header';
 import { Container } from 'react-bootstrap'
+import StickyMenu from 'components/StickyMenu'
+import BottomFade from './BottomFade';
+import Head from 'next/head'
 
 export default function PageLayout({children, className}) {
     return (
+        <>
         <Container>
-            <BlogNavbar/>
+            <Head>
+                <title>Alex Sumoski | Developer</title>
+                <link rel="icon" type="image/png" href="/public/vercel.svg" />
+            </Head>
+            <Header/>
             <div className={`page-wrapper ${className}`}>
                 {children}
             </div>
-            <footer className="page-footer">
-                <div>
-                    <a href="#">courses</a>{' | '}
-                    <a href="#">github</a>{' | '}
-                    <a href="#">facebook</a>
-                </div>
-            </footer>
         </Container>
+        <footer className="page-footer" />
+        </>
     )
 }
